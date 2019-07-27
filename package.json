@@ -1,0 +1,26 @@
+{
+  "name": "dynamic-passport-strategies",
+  "version": "0.0.1",
+  "description": "dynamicaly add and remove passport strategies in your express application during runtime",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "jest --coverage --forceExit && codecov"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/JWebCoder/dynamic-passport-strategies.git"
+  },
+  "keywords": [
+    "dynamic",
+    "passport",
+    "strategies",
+    "express",
+    "runtime"
+  ],
+  "author": "João Moura <joao87moura@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JWebCoder/dynamic-passport-strategies/issues"
+  },
+  "homepage": "https://github.com/JWebCoder/dynamic-passport-strategies#readme"
+}
