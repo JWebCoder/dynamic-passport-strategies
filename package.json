@@ -4,8 +4,8 @@
   "description": "dynamicaly add and remove passport strategies in your express application during runtime",
   "main": "lib/index.js",
   "scripts": {
-    "dev": "DEBUG=DPS:* NODE_ENV=development ts-node ./src/index.ts",
-    "prod": "DEBUG=DPS:* NODE_ENV=production ts-node ./src/index.ts",
+    "dev": "DEBUG=dps:* NODE_ENV=development ts-node ./src/index.ts",
+    "prod": "DEBUG=dps:* NODE_ENV=production ts-node ./src/index.ts",
     "clean": "rm -rf lib && mkdir lib",
     "build": "npm run lint && npm run clean && npm run build:js",
     "build:js": "tsc",

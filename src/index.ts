@@ -11,17 +11,26 @@ class Authentication extends Passport {
   private reloadStrategies: boolean = true
   private routes: Router[] = []
   private cluster: boolean = false
+  private modulesPath: string = './'
   constructor(config?: {
     strategies?: string[] | string,
     store?: any,
+    modulesPath?: string
   }) {
     super()
     debug('Creating authentication controller')
 
-    if (config && config.strategies) {
-      strategiesController.setStrategies(
-        Array.isArray(config.strategies) ? config.strategies : [config.strategies]
-      )
+    if (config) {
+      if (config.strategies) {
+        strategiesController.setStrategies(
+          Array.isArray(config.strategies) ? config.strategies : [config.strategies]
+        )
+      }
+
+      if (config.modulesPath) {
+        this.modulesPath = config.modulesPath
+        strategiesController.setPath(this.modulesPath)
+      }
     }
 
     this.serializeUser(
@@ -43,6 +52,11 @@ class Authentication extends Passport {
     strategiesController.onChange(() => {
       this.reloadStrategies = true
     })
+  }
+
+  public setupModulesPath(modulesPath: string) {
+    this.modulesPath = modulesPath
+    strategiesController.setPath(this.modulesPath)
   }
 
   public setStrategies(strategies: string[], callTcp: boolean = true) {

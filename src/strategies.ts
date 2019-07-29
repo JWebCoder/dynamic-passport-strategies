@@ -2,8 +2,9 @@ import Debug from 'debug'
 import { Router } from 'express'
 import net from 'net'
 import { Passport } from 'passport'
+import path from 'path'
 
-const debug = Debug(`dsp:${process.pid}-authentication-worker`)
+const debug = Debug(`dps:${process.pid}-authentication-worker`)
 
 class StrategiesController extends Passport {
   private strategies: Set<string> = new Set()
@@ -11,6 +12,7 @@ class StrategiesController extends Passport {
   private tcpClient: net.Socket | undefined = undefined
   private connectedToTcpCluster: boolean = false
   private callbacks: Array<() => void> = []
+  private modulesPath: string = './'
 
   constructor(config?: {
     strategies?: string[] | string,
@@ -114,7 +116,7 @@ class StrategiesController extends Passport {
     const routes: Router[] = []
     for (const strategy of this.strategies) {
       if (!this.modules[strategy]) {
-        modules.push(import('./' + strategy))
+        modules.push(import(path.join(this.modulesPath, strategy)))
         toSave.push(strategy)
       }
     }
@@ -134,6 +136,11 @@ class StrategiesController extends Passport {
         return routes
       }
     )
+  }
+
+  public setPath(modulesPath: string) {
+    this.modulesPath = modulesPath
+    return true
   }
 
   private triggerCallbacks() {
