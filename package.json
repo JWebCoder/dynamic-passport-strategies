@@ -4,6 +4,12 @@
   "description": "dynamicaly add and remove passport strategies in your express application during runtime",
   "main": "lib/index.js",
   "scripts": {
+    "dev": "DEBUG=DPS:* NODE_ENV=development ts-node ./src/index.ts",
+    "prod": "DEBUG=DPS:* NODE_ENV=production ts-node ./src/index.ts",
+    "clean": "rm -rf lib && mkdir lib",
+    "build": "npm run lint && npm run clean && npm run build:js",
+    "build:js": "tsc",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
     "test": "jest --coverage --forceExit && codecov"
   },
   "repository": {
@@ -22,5 +28,29 @@
   "bugs": {
     "url": "https://github.com/JWebCoder/dynamic-passport-strategies/issues"
   },
-  "homepage": "https://github.com/JWebCoder/dynamic-passport-strategies#readme"
+  "homepage": "https://github.com/JWebCoder/dynamic-passport-strategies#readme",
+  "peerDependencies": {
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "passport": "^0.4.0"
+  },
+  "devDependencies": {
+    "@types/async": "^3.0.1",
+    "@types/debug": "^4.1.4",
+    "@types/dotenv": "^6.1.1",
+    "@types/express-session": "^1.15.13",
+    "@types/http-errors": "^1.6.1",
+    "@types/node": "^12.6.8",
+    "@types/passport": "^1.0.0",
+    "@types/shortid": "0.0.29",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "async": "^3.1.0",
+    "debug": "^4.1.1",
+    "dotenv": "^8.0.0",
+    "http-errors": "^1.7.3",
+    "shortid": "^2.2.14"
+  }
 }
