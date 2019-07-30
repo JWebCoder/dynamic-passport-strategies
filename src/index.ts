@@ -222,3 +222,4 @@ export class Authentication extends Passport {
 const authentication = new Authentication()
 
 export default authentication
+export { default as authenticationCluster } from './cluster'

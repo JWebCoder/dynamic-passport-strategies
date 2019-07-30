@@ -64,7 +64,7 @@ app.use([
 
 ```js
 import cluster from 'cluster'
-import authenticationCluster from 'dynamic-passport-strategies/cluster'
+import { authenticationCluster } from 'dynamic-passport-strategies'
 
 if (cluster.isMaster) {
   // initialize the authentication control

@@ -1,0 +1,59 @@
+{
+  "name": "example",
+  "version": "0.0.0",
+  "description": "example application",
+  "main": "index.js",
+  "scripts": {
+    "dev": "DEBUG=example:* NODE_ENV=development ts-node ./src/index.ts",
+    "prod": "DEBUG=example:* NODE_ENV=production ts-node ./src/index.ts",
+    "clean": "rm -rf lib && mkdir lib",
+    "build": "npm run lint && npm run clean && npm run build:js",
+    "build:js": "tsc",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "server",
+    "nodejs",
+    "dynamic",
+    "passport",
+    "strategies"
+  ],
+  "author": "João Moura <joao87moura@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^3.1.0",
+    "body-parser": "^1.14.2",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.5",
+    "dynamic-passport-strategies": "file:..",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "http-errors": "^1.7.2",
+    "moment-timezone": "^0.5.25",
+    "morgan": "^1.6.1",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0",
+    "request": "^2.69.0",
+    "shortid": "^2.2.14",
+    "tslint": "^5.17.0"
+  },
+  "devDependencies": {
+    "@types/async": "^3.0.0",
+    "@types/cookie-parser": "^1.4.1",
+    "@types/cors": "^2.8.5",
+    "@types/debug": "^4.1.4",
+    "@types/express": "^4.16.1",
+    "@types/express-session": "^1.15.12",
+    "@types/http-errors": "^1.6.1",
+    "@types/morgan": "^1.7.35",
+    "@types/node": "^12.0.4",
+    "@types/passport": "^1.0.0",
+    "@types/passport-facebook": "^2.1.9",
+    "@types/passport-local": "^1.0.33",
+    "@types/shortid": "0.0.29",
+    "debug": "^4.1.1",
+    "ts-node": "^8.2.0",
+    "typescript": "^3.5.1"
+  }
+}
