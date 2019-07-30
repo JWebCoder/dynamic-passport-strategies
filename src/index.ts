@@ -116,7 +116,7 @@ class Authentication extends Passport {
         return next()
       }
     }
-    return next(createError(403, 'Unauthorized'))
+    return next(createError(401, 'Unauthorized'))
   }
 
   public router = (req: Request, res: Response, next: NextFunction) => {
@@ -150,7 +150,7 @@ class Authentication extends Passport {
     )
   }
 
-  public ensureLoggedIn(options?: string | {redirectTo?: string, setReturnTo?: string}) {
+  public ensureLoggedIn(options?: string | {redirectTo?: string, setReturnTo?: boolean}) {
     if (typeof options === 'string') {
       options = { redirectTo: options }
     }
