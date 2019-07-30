@@ -5,32 +5,26 @@ import createError from 'http-errors'
 import { Passport } from 'passport'
 import strategiesController from './strategies'
 
+interface IConfig {
+  strategies?: string[] | string,
+  store?: any,
+  modulesPath?: string,
+  cluster?: boolean,
+}
+
 const debug = Debug(`dps:${process.pid}-authentication-worker`)
 
-class Authentication extends Passport {
+export class Authentication extends Passport {
   private reloadStrategies: boolean = true
   private routes: Router[] = []
   private cluster: boolean = false
   private modulesPath: string = './'
-  constructor(config?: {
-    strategies?: string[] | string,
-    store?: any,
-    modulesPath?: string
-  }) {
+  constructor(config?: IConfig) {
     super()
     debug('Creating authentication controller')
 
     if (config) {
-      if (config.strategies) {
-        strategiesController.setStrategies(
-          Array.isArray(config.strategies) ? config.strategies : [config.strategies]
-        )
-      }
-
-      if (config.modulesPath) {
-        this.modulesPath = config.modulesPath
-        strategiesController.setPath(this.modulesPath)
-      }
+      this.configure(config)
     }
 
     this.serializeUser(
@@ -46,17 +40,35 @@ class Authentication extends Passport {
     )
   }
 
+  public configure(config: IConfig) {
+    if (config.strategies) {
+      this.setStrategies(Array.isArray(config.strategies) ? config.strategies : [config.strategies])
+    }
+
+    if (config.modulesPath) {
+      this.modulesPath = config.modulesPath
+      strategiesController.setPath(this.modulesPath)
+    }
+
+    if (config.cluster && !this.cluster) {
+      this.cluster = true
+      strategiesController.setupCluster()
+      strategiesController.onChange(() => {
+        this.reloadStrategies = true
+      })
+    }
+  }
+
   public setupCluster() {
-    this.cluster = true
-    strategiesController.setupCluster()
-    strategiesController.onChange(() => {
-      this.reloadStrategies = true
+    this.configure({
+      cluster: true,
     })
   }
 
   public setupModulesPath(modulesPath: string) {
-    this.modulesPath = modulesPath
-    strategiesController.setPath(this.modulesPath)
+    this.configure({
+      modulesPath,
+    })
   }
 
   public setStrategies(strategies: string[], callTcp: boolean = true) {

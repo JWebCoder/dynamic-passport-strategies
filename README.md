@@ -19,7 +19,10 @@ import path from 'path'
 import authentication from 'dynamic-passport-strategies'
 
 // set the folder containing your strategies, authentication for example
-authentication.setupModulesPath(path.join(__dirname, './authentication'))
+authentication.configure({
+  modulesPath: path.join(__dirname, './authentication')
+  strategies: ['facebook'],
+})
 
 const app = express()
 app.use([
@@ -33,7 +36,6 @@ app.use([
 ])
 
 // setup the strategies to use and add them to the application middleware
-authentication.setStrategies(['facebook'])
 app.use('/', authentication.router)
 
 app.listen(9000, function() {
@@ -47,8 +49,11 @@ app.listen(9000, function() {
 ```js
 ...
 // just activate it
-authentication.setupCluster()
-authentication.setupModulesPath(path.join(__dirname, './authentication'))
+authentication.configure({
+  cluster: true,
+  modulesPath: path.join(__dirname, './authentication'),
+  strategies: ['facebook'],
+})
 
 const app = express()
 app.use([
