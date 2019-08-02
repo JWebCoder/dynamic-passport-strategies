@@ -5,7 +5,6 @@ import Debug from 'debug'
 import authentication from 'dynamic-passport-strategies'
 import express from 'express'
 import session from 'express-session'
-import fs from 'fs'
 import path from 'path'
 import routes from './routes'
 

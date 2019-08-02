@@ -1,5 +1,5 @@
 import Debug from 'debug'
-import { NextFunction, Request, Response, Router } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import createError from 'http-errors'
 import { Passport } from 'passport'
 import Routes from './routes'
