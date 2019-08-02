@@ -49,7 +49,12 @@ export class Routes {
   private moduleLoaderRoute() {
     const router = Router()
 
-    router.get('/unload/:strategy', this.authentication.isAdmin, (req: Request, res: Response, next: NextFunction) => {
+    router.get(
+      '/unload/:strategy',
+      (req, res, next) => {
+        this.authentication.isAdmin(req, res, next)
+      },
+      (req: Request, res: Response, next: NextFunction) => {
       const strategy = req.params.strategy
       if (strategiesController.has(strategy)) {
         this.authentication.removeStrategies(strategy)
@@ -60,7 +65,12 @@ export class Routes {
       }
     })
 
-    router.get('/load/:strategy', this.authentication.isAdmin, (req: Request, res: Response, next: NextFunction) => {
+    router.get(
+      '/load/:strategy',
+      (req, res, next) => {
+        this.authentication.isAdmin(req, res, next)
+      },
+      (req: Request, res: Response, next: NextFunction) => {
       const strategy = req.params.strategy
       if (!strategiesController.has(strategy)) {
         this.authentication.addStrategies(strategy)

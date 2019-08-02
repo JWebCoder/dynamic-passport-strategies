@@ -4,7 +4,7 @@
   "description": "example application",
   "main": "index.js",
   "scripts": {
-    "dev": "DEBUG=example:* NODE_ENV=development ndb ts-node ./src/index.ts",
+    "dev": "DEBUG=example:* NODE_ENV=development ts-node ./src/index.ts",
     "prod": "DEBUG=example:* NODE_ENV=production ts-node ./src/index.ts",
     "clean": "rm -rf lib && mkdir lib",
     "build": "npm run lint && npm run clean && npm run build:js",
