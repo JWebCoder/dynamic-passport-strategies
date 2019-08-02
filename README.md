@@ -1,5 +1,3 @@
-# NOT READY YET
-
 # Dynamic Passport Strategies
 
 Dynamically add and remove passport strategies in your express application during runtime
