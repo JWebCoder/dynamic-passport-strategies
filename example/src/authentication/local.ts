@@ -19,6 +19,7 @@ class FacebookAuth {
         if (userLogging.data.password !== password) {
           return done(null, false)
         }
+
         return done(null, userLogging.data)
       }
     ))

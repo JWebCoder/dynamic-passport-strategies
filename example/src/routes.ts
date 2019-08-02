@@ -14,4 +14,12 @@ router.get(
   }
 )
 
+router.get(
+  '/logout',
+  authentication.logout,
+  (req, res, next) => {
+    res.json(res.locals)
+  }
+)
+
 export default router

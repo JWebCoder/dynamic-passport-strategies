@@ -23,3 +23,21 @@ Logs in a user or creates a new account with the passed parameters
 `GET /me`
 
 Retrieves the logged in user information
+
+---
+
+`GET /logout`
+
+Logs out the user
+
+---
+
+`GET /load/:strategy`
+
+Activates a currently deactivated strategy
+
+---
+
+`GET /unload/:strategy`
+
+Deactivates a currently active strategy

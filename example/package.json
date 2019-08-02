@@ -4,7 +4,7 @@
   "description": "example application",
   "main": "index.js",
   "scripts": {
-    "dev": "DEBUG=example:* NODE_ENV=development ts-node ./src/index.ts",
+    "dev": "DEBUG=example:* NODE_ENV=development ndb ts-node ./src/index.ts",
     "prod": "DEBUG=example:* NODE_ENV=production ts-node ./src/index.ts",
     "clean": "rm -rf lib && mkdir lib",
     "build": "npm run lint && npm run clean && npm run build:js",
@@ -53,6 +53,7 @@
     "@types/passport-local": "^1.0.33",
     "@types/shortid": "0.0.29",
     "debug": "^4.1.1",
+    "ndb": "^1.1.4",
     "ts-node": "^8.2.0",
     "typescript": "^3.5.1"
   }

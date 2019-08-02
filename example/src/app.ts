@@ -6,26 +6,24 @@ import authentication from 'dynamic-passport-strategies'
 import express from 'express'
 import session from 'express-session'
 import fs from 'fs'
-import morgan from 'morgan'
 import path from 'path'
 import routes from './routes'
 
 let debug: Debug.Debugger
 
 export default class App {
-  public accessLogStream: fs.WriteStream
-
   constructor(workerPid: number) {
     debug = Debug(`example:${workerPid}-setup`)
     debug('construting')
-    this.accessLogStream = fs.createWriteStream(__dirname + '/../access.log', {
-      flags: 'a',
-    })
 
     authentication.configure({
       cluster: true,
       modulesPath: path.join(__dirname, './authentication'),
       strategies: ['local'],
+      roles: {
+        property: 'name',
+        adminRole: 'admin',
+      },
     })
   }
 
@@ -35,9 +33,6 @@ export default class App {
 
     debug('setting up middleware')
     app.use([
-      morgan('combined', {
-        stream: this.accessLogStream,
-      }),
       cookieParser(),
       bodyParser.json(), // for parsing application/json
       bodyParser.urlencoded({ // for parsing application/x-www-form-urlencoded

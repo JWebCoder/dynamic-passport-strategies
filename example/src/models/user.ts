@@ -1,7 +1,9 @@
 interface IUserData {
   username: string,
   password: string,
-  roles?: string[]
+  roles?: Array<{
+    name: string,
+  }>
 }
 
 interface IUser {
@@ -19,7 +21,9 @@ export default class User {
           data: users[username],
         }
       } else {
-        data.roles = ['admin']
+        data.roles = [{
+          name: 'admin',
+        }]
         users[username] = data
         created = true
       }

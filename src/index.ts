@@ -1,28 +1,36 @@
-import { eachSeries } from 'async'
 import Debug from 'debug'
 import { NextFunction, Request, Response, Router } from 'express'
 import createError from 'http-errors'
 import { Passport } from 'passport'
+import Routes from './routes'
 import strategiesController from './strategies'
+
+interface IRolesConfig {
+  property?: string,
+  adminRole?: string
+}
 
 interface IConfig {
   strategies?: string[] | string,
   store?: any,
   modulesPath?: string,
   cluster?: boolean,
+  roles?: IRolesConfig
 }
 
 const debug = Debug(`dps:${process.pid}-authentication-worker`)
 
 export class Authentication extends Passport {
-  private reloadStrategies: boolean = true
-  private routes: Router[] = []
   private cluster: boolean = false
   private modulesPath: string = './'
+  private rolesProperty: string = ''
+  private adminRole: string = 'admin'
+  private routes: Routes
   constructor(config?: IConfig) {
     super()
     debug('Creating authentication controller')
 
+    this.routes = new Routes(this)
     if (config) {
       this.configure(config)
     }
@@ -54,8 +62,12 @@ export class Authentication extends Passport {
       this.cluster = true
       strategiesController.setupCluster()
       strategiesController.onChange(() => {
-        this.reloadStrategies = true
+        this.routes.reloadStrategies = true
       })
+    }
+
+    if (config.roles) {
+      this.configureRoles(config.roles)
     }
   }
 
@@ -72,19 +84,19 @@ export class Authentication extends Passport {
   }
 
   public setStrategies(strategies: string[], callTcp: boolean = true) {
-    this.reloadStrategies = true
+    this.routes.reloadStrategies = true
     this.loadedStrategies().forEach(this.unuse)
     strategiesController.setStrategies(strategies, this.cluster && callTcp)
   }
 
   public addStrategies(strategy: string | string[], callTcp: boolean = true) {
-    this.reloadStrategies = true
+    this.routes.reloadStrategies = true
     strategiesController.addStrategies(strategy, this.cluster && callTcp)
     return true
   }
 
   public removeStrategies(strategy: string | string[], callTcp: boolean = true) {
-    this.reloadStrategies = true
+    this.routes.reloadStrategies = true
     Array.isArray(strategy) ? strategy.forEach(this.unuse) : this.unuse(strategy)
     strategiesController.removeStrategies(strategy, this.cluster && callTcp)
     return true
@@ -123,7 +135,13 @@ export class Authentication extends Passport {
   public isAdmin(req: Request, res: Response, next: NextFunction) {
     if (req.user && req.user.roles && req.user.roles.length > 0) {
       if (req.user.roles.find(
-        (role: any) => role && role.name && role.name.includes('admin')
+        (role: any) => {
+          let currentRole: string = role
+          if (this.rolesProperty) {
+            currentRole = role[this.rolesProperty]
+          }
+          return currentRole.includes(this.adminRole)
+        }
       )) {
         return next()
       }
@@ -132,34 +150,7 @@ export class Authentication extends Passport {
   }
 
   public router = (req: Request, res: Response, next: NextFunction) => {
-    let routes: Promise<Router[]> | undefined
-    if (this.reloadStrategies) {
-      debug('Reloading strategies')
-      this.reloadStrategies = false
-      routes = this.getRoutes()
-    } else {
-      routes = Promise.resolve(this.routes)
-    }
-
-    routes.then(
-      (authenticationRouters: Router[]) => {
-        eachSeries(
-          authenticationRouters,
-          (route, callback) => {
-            // call route with req, res, and callback as next
-            route(req, res, callback)
-          },
-          // final callback
-          (err) => {
-            if ( err ) {
-              next(err)
-            } else {
-              next()
-            }
-          }
-        )
-      }
-    )
+    this.routes.router(req, res, next)
   }
 
   public ensureLoggedIn(options?: string | {redirectTo?: string, setReturnTo?: boolean}) {
@@ -182,40 +173,13 @@ export class Authentication extends Passport {
     }
   }
 
-  private moduleLoaderRoute() {
-    const router = Router()
-
-    router.get('/unload/:strategy', (req: Request, res: Response, next: NextFunction) => {
-      const strategy = req.params.strategy
-      if (strategiesController.has(strategy)) {
-        this.removeStrategies(strategy)
-        debug(`Removed stragety - ${strategy}`)
-        res.json({message: `${strategy} authentication removed`, status: 'ok'})
-      } else {
-        res.json({message: `${strategy} authentication not found`, status: 'not found'})
-      }
-    })
-
-    router.get('/load/:strategy', (req: Request, res: Response, next: NextFunction) => {
-      const strategy = req.params.strategy
-      if (!strategiesController.has(strategy)) {
-        this.addStrategies(strategy)
-        debug(`Added stragety - ${strategy}`)
-      }
-      res.json({message: `${strategy} authentication enabled`, status: 'ok'})
-    })
-
-    return router
-  }
-
-  private getRoutes() {
-    return strategiesController.getStrategiesRoutes().then(
-      (routes) => {
-        routes.push(this.moduleLoaderRoute())
-        this.routes = routes
-        return this.routes
-      }
-    )
+  private configureRoles(rolesConfig: IRolesConfig) {
+    if (rolesConfig.property) {
+      this.rolesProperty = rolesConfig.property
+    }
+    if (rolesConfig.adminRole) {
+      this.adminRole = rolesConfig.adminRole
+    }
   }
 }
 
