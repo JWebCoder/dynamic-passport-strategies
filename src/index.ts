@@ -10,9 +10,8 @@ interface IRolesConfig {
   adminRole?: string
 }
 
-interface IConfig {
+export interface IConfig {
   strategies?: string[] | string,
-  store?: any,
   modulesPath?: string,
   cluster?: boolean,
   roles?: IRolesConfig
@@ -85,7 +84,7 @@ export class Authentication extends Passport {
 
   public setStrategies(strategies: string[], callTcp: boolean = true) {
     this.routes.reloadStrategies = true
-    this.loadedStrategies().forEach(this.unuse)
+    this.loadedStrategies().forEach((s) => this.unuse(s))
     strategiesController.setStrategies(strategies, this.cluster && callTcp)
   }
 
@@ -97,31 +96,13 @@ export class Authentication extends Passport {
 
   public removeStrategies(strategy: string | string[], callTcp: boolean = true) {
     this.routes.reloadStrategies = true
-    Array.isArray(strategy) ? strategy.forEach(this.unuse) : this.unuse(strategy)
+    Array.isArray(strategy) ? strategy.forEach((s) => this.unuse(s)) : this.unuse(strategy)
     strategiesController.removeStrategies(strategy, this.cluster && callTcp)
     return true
   }
 
   public loadedStrategies() {
     return strategiesController.loadedStrategies()
-  }
-
-  // runs the login function from passport to register the user in the session
-  public login(req: Request, res: Response, next: NextFunction, user: any) {
-    req.login(
-      user,
-      (err) => {
-        if (err) {
-          next(err)
-          return
-        }
-        res.locals = {
-          ...res.locals,
-          user,
-        }
-        next()
-      }
-    )
   }
 
   public logout(req: Request, res: Response, next: NextFunction) {
