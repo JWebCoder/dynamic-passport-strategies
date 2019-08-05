@@ -46,8 +46,12 @@ export class Routes {
     )
   }
 
-  private moduleLoaderRoute() {
+  private moduleLoaderRoute(): Router {
     const router = Router()
+
+    router.post('/logout',
+      this.authentication.logout
+    )
 
     router.get(
       '/unload/:strategy',
@@ -78,6 +82,14 @@ export class Routes {
       }
       res.json({message: `${strategy} authentication enabled`, status: 'ok'})
     })
+
+    router.get(
+      '/logout',
+      this.authentication.logout,
+      (req, res, next) => {
+        res.json(res.locals)
+      }
+    )
 
     return router
   }

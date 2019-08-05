@@ -34,33 +34,39 @@ export default function() {
 
       // The server can also receive data from the client by reading from its socket.
       socket.on('data', function(chunk: any) {
-        const data = JSON.parse(chunk.toString())
+        const chunkArray: string[] = chunk.toString().split('${}')
         let strategiesChanged = false
-        if (strategies.size !== data.length) {
-          strategies = new Set(data)
-          strategiesChanged = true
-        } else {
-          data.forEach(
-            (receivedStrategy: string) => {
-              for (const savedStrategy of strategies) {
-                if (receivedStrategy.indexOf(savedStrategy) < 0) {
-                  strategies.delete(savedStrategy)
-                  strategiesChanged = true
+        let finalData: [] = []
+        chunkArray.filter((e) => e).forEach(
+          (stringChunk: string) => {
+            const data = JSON.parse(stringChunk)
+            if (strategies.size !== data.length) {
+              strategies = new Set(data)
+              strategiesChanged = true
+            } else {
+              data.forEach(
+                (receivedStrategy: string) => {
+                  for (const savedStrategy of strategies) {
+                    if (receivedStrategy.indexOf(savedStrategy) < 0) {
+                      strategies.delete(savedStrategy)
+                      strategiesChanged = true
+                    }
+                  }
+                  if (!strategies.has(receivedStrategy)) {
+                    strategies.add(receivedStrategy)
+                    strategiesChanged = true
+                  }
                 }
-              }
-              if (!strategies.has(receivedStrategy)) {
-                strategies.add(receivedStrategy)
-                strategiesChanged = true
-              }
+              )
             }
-          )
-        }
-
+            finalData = data
+          }
+        )
         if (strategiesChanged) {
           Object.keys(clients).forEach(
             (clientId) => {
               if (clientId !== id) {
-                clients[clientId].write(JSON.stringify(data))
+                clients[clientId].write(JSON.stringify(finalData) + '${}')
               }
             }
           )

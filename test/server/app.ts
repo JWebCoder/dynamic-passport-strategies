@@ -2,15 +2,17 @@ import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import Debug from 'debug'
-import authentication from 'dynamic-passport-strategies'
 import express from 'express'
+import core from 'express-serve-static-core'
 import session from 'express-session'
 import path from 'path'
+import authentication from '../../src'
 import routes from './routes'
 
 let debug: Debug.Debugger
 
 export default class App {
+  public server: core.Express | undefined
   constructor(workerPid: number) {
     debug = Debug(`example:${workerPid}-setup`)
     debug('construting')
@@ -55,8 +57,16 @@ export default class App {
 
     app.use('/', authentication.router)
 
+    app.use('/time', (req, res) => {
+      res.json({
+        time: new Date().toLocaleDateString(),
+      })
+    })
+
     app.listen(9000, function() {
       debug('Process ' + process.pid + ' is listening on port 9000')
     })
+
+    this.server = app
   }
 }
