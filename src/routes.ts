@@ -46,7 +46,7 @@ export class Routes {
     )
   }
 
-  private moduleLoaderRoute() {
+  private moduleLoaderRoute(): Router {
     const router = Router()
 
     router.get(
@@ -85,6 +85,9 @@ export class Routes {
   private getRoutes() {
     return strategiesController.getStrategiesRoutes().then(
       (routes) => {
+        if (!routes) {
+          routes = []
+        }
         routes.push(this.moduleLoaderRoute())
         this.routes = routes
         return this.routes

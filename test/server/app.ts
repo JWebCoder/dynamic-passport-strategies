@@ -18,7 +18,7 @@ export default class App {
     debug('construting')
 
     authentication.configure({
-      cluster: false,
+      cluster: true,
       modulesPath: path.join(__dirname, './authentication'),
       strategies: ['local'],
       roles: {

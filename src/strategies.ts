@@ -14,15 +14,6 @@ class StrategiesController extends Passport {
   private callbacks: Array<() => void> = []
   private modulesPath: string = './'
 
-  constructor(config?: {
-    strategies?: string[] | string,
-  }) {
-    super()
-    if (config && config.strategies) {
-      this.strategies = new Set(config.strategies)
-    }
-  }
-
   public setupCluster() {
     // The port number and hostname of the server.
     let port = parseInt(process.env.CLUSTER_PORT || '', 10)
@@ -43,12 +34,17 @@ class StrategiesController extends Passport {
       tcpClientSocket.setNoDelay(true)
       const strategies = this.loadedStrategies()
       if (strategies.length) {
-        tcpClientSocket.write(JSON.stringify(this.loadedStrategies()))
+        tcpClientSocket.write(JSON.stringify(this.loadedStrategies()) + '${}')
       }
     })
 
     this.tcpClient.on('data', (chunk) => {
-      this.setStrategies(JSON.parse(chunk.toString()), false)
+      const chunksArray: string[] = chunk.toString().split('${}').filter((e) => e)
+      chunksArray.forEach(
+        (chunkString: string) => {
+          this.setStrategies(JSON.parse(chunkString), false)
+        }
+      )
       this.triggerCallbacks()
     })
 
@@ -110,7 +106,7 @@ class StrategiesController extends Passport {
     return strategies
   }
 
-  public getStrategiesRoutes() {
+  public getStrategiesRoutes(): Promise<Router[] | undefined> {
     const modules: any = []
     const toSave: string[] = []
     const routes: Router[] = []
@@ -135,6 +131,10 @@ class StrategiesController extends Passport {
 
         return routes
       }
+    ).catch(
+      (error) => {
+        return undefined
+      }
     )
   }
 
@@ -151,7 +151,7 @@ class StrategiesController extends Passport {
 
   private callTcp() {
     if (this.connectedToTcpCluster && this.tcpClient) {
-      this.tcpClient.write(JSON.stringify(this.loadedStrategies()))
+      this.tcpClient.write(JSON.stringify(this.loadedStrategies()) + '${}')
     }
   }
 

@@ -6,7 +6,7 @@ import server from './server'
 const config = {
   strategies: 'local',
   modulesPath: path.join(__dirname, './server/authentication'),
-  cluster: false,
+  cluster: true,
   roles: {
     adminRole: 'admin',
     property: 'name',
@@ -47,6 +47,25 @@ describe('Start dynamic controller', () => {
     expect(added).toEqual(true)
     const strategies = application.loadedStrategies()
     expect(strategies).toEqual(['local'])
+  })
+
+  it('should load the strategy facebook, multi strategy cluster test', () => {
+    application.setStrategies(['local', 'facebook'])
+    const strategies = application.loadedStrategies()
+    expect(strategies).toEqual(['local', 'facebook'])
+  })
+
+  it('/unload/facebook should unload the strategy facebook, multi strategy cluster test', (done) => {
+    agent.get(
+      '/unload/facebook'
+    ).then(
+      (response) => {
+        expect(response.status).toBe(200)
+        expect(response.body.message).toBeTruthy()
+        expect(response.body.message).toBe('facebook authentication removed')
+        done()
+      }
+    )
   })
 
   it('login should return status:ok', (done) => {
