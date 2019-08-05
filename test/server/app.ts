@@ -57,6 +57,12 @@ export default class App {
 
     app.use('/', authentication.router)
 
+    app.use('/time', (req, res) => {
+      res.json({
+        time: new Date().toLocaleDateString(),
+      })
+    })
+
     app.listen(9000, function() {
       debug('Process ' + process.pid + ' is listening on port 9000')
     })

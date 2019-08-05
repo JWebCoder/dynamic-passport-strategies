@@ -49,6 +49,10 @@ export class Routes {
   private moduleLoaderRoute(): Router {
     const router = Router()
 
+    router.post('/logout',
+      this.authentication.logout
+    )
+
     router.get(
       '/unload/:strategy',
       (req, res, next) => {
@@ -79,15 +83,20 @@ export class Routes {
       res.json({message: `${strategy} authentication enabled`, status: 'ok'})
     })
 
+    router.get(
+      '/logout',
+      this.authentication.logout,
+      (req, res, next) => {
+        res.json(res.locals)
+      }
+    )
+
     return router
   }
 
   private getRoutes() {
     return strategiesController.getStrategiesRoutes().then(
       (routes) => {
-        if (!routes) {
-          routes = []
-        }
         routes.push(this.moduleLoaderRoute())
         this.routes = routes
         return this.routes

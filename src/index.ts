@@ -47,6 +47,18 @@ export class Authentication extends Passport {
     )
   }
 
+  public getConfig(): IConfig {
+    return {
+      strategies: this.loadedStrategies(),
+      modulesPath: this.modulesPath,
+      cluster: this.cluster,
+      roles: {
+        property: this.rolesProperty,
+        adminRole: this.adminRole,
+      },
+    }
+  }
+
   public configure(config: IConfig) {
     if (config.strategies) {
       this.setStrategies(Array.isArray(config.strategies) ? config.strategies : [config.strategies])
@@ -134,19 +146,9 @@ export class Authentication extends Passport {
     this.routes.router(req, res, next)
   }
 
-  public ensureLoggedIn(options?: string | {redirectTo?: string, setReturnTo?: boolean}) {
-    if (typeof options === 'string') {
-      options = { redirectTo: options }
-    }
-    options = options || {}
-
-    const setReturnTo = options.setReturnTo === undefined ? true : options.setReturnTo
-
+  public ensureLoggedIn() {
     return function(req: Request, res: Response, next: NextFunction) {
       if (!req.isAuthenticated || !req.isAuthenticated()) {
-        if (setReturnTo && req.session) {
-          req.session.returnTo = req.originalUrl || req.url
-        }
         return next(createError(401, 'Unauthorized'))
       } else {
         next()

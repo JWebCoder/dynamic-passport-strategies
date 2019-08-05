@@ -2,6 +2,7 @@ import Debug from 'debug'
 import { Router } from 'express'
 import { PassportStatic } from 'passport'
 import localStrategy from 'passport-local'
+import authentication from '../../../src'
 import User from '../models/user'
 
 const debug = Debug(`example:${process.pid}-facebook-strategy`)

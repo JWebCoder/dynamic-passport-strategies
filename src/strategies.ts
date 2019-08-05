@@ -106,7 +106,7 @@ class StrategiesController extends Passport {
     return strategies
   }
 
-  public getStrategiesRoutes(): Promise<Router[] | undefined> {
+  public getStrategiesRoutes(): Promise<Router[]> {
     const modules: any = []
     const toSave: string[] = []
     const routes: Router[] = []
@@ -133,7 +133,7 @@ class StrategiesController extends Passport {
       }
     ).catch(
       (error) => {
-        return undefined
+        return []
       }
     )
   }
